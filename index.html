@@ -3,9 +3,275 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Cryptography App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        #mainPage, #projectPage, #cryptographyPage, #cipherLibrary {
+            padding: 20px;
+        }
+
+        #projectPage, #cryptographyPage, #cipherLibrary {
+            display: none;
+        }
+
+        textarea {
+            width: 100%;
+            height: 100px;
+            margin: 10px 0;
+            border: 2px solid blue;
+            padding: 5px;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+
+        input {
+            width: 50px;
+            padding: 5px;
+            font-size: 14px;
+            border: 2px solid blue;
+            border-radius: 5px;
+        }
+
+        .project-item, .cipher-item {
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            background: #f9f9f9;
+        }
+
+        button {
+            background-color: orange;
+            color: white;
+            border: none;
+            padding: 10px;
+            margin: 5px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: darkorange;
+        }
+
+        .cipher-input {
+            display: flex;
+            margin-bottom: 10px;
+        }
+
+        .cipher-input label {
+            margin-right: 10px;
+        }
+
+        .cipher-input input {
+            width: 60px;  /* Adjust width as needed */
+        }
+    </style>
 </head>
 <body>
-    <h1>Hello World</h1>
+    <div id="mainPage">
+        <h1>Cryptography App</h1>
+        <button onclick="startNewProject()">Open New Project</button>
+        <button onclick="showProjects()">Open Saved Projects</button>
+    </div>
+
+    <div id="projectPage">
+        <h2>Text</h2>
+        <textarea id="plainText" placeholder="Type your text here..." oninput="updateCryptography()"></textarea>
+        <h3>Encrypted Text</h3> <!-- Updated heading here -->
+        <textarea id="encryptedText" readonly></textarea>
+        <button onclick="showCipherLibrary()">Select Cipher Pattern</button>
+        <button onclick="customCipherPattern()">Create Custom Cipher</button>
+        <button onclick="goBackHome()">Back to Home</button>
+    </div>
+
+    <div id="cipherLibrary">
+        <h2>Cipher Library</h2>
+        <div>
+            <h3>Pre-Installed Ciphers</h3>
+            <div id="preInstalledCiphers"></div>
+        </div>
+        <div>
+            <h3>Your Custom Ciphers</h3>
+            <div id="userCiphers"></div>
+        </div>
+        <button onclick="goBackToProject()">Back to Project</button>
+    </div>
+
+    <div id="customCipherPage" style="display: none;">
+        <h2>Create Custom Cipher</h2>
+        <div id="cipherInputs">
+            <!-- Letter inputs will be dynamically generated -->
+        </div>
+        <button onclick="saveCustomCipher()">Save Custom Cipher</button>
+        <button onclick="goBackToProject()">Back to Project</button>
+    </div>
+
+    <script>
+        const preInstalledCiphers = {
+            "Caesar Cipher (Shift 3)": createShiftCipher(3),
+            "Atbash Cipher": createAtbashCipher(),
+            "Vowel Swap": createVowelSwapCipher()
+        };
+
+        let cipherMap = createDefaultCipher();
+        let userCiphers = [];
+
+        // This will ensure the page doesn't retain any cipher patterns from previous visits
+        sessionStorage.clear();
+
+        function createDefaultCipher() {
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'; // Including lowercase letters
+            let map = {};
+            alphabet.split('').forEach(char => {
+                map[char] = char;
+            });
+            return map;
+        }
+
+        function createShiftCipher(shift) {
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+            let map = {};
+            alphabet.split('').forEach((char, i) => {
+                map[char] = alphabet[(i + shift) % alphabet.length];
+            });
+            return map;
+        }
+
+        function createAtbashCipher() {
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+            let map = {};
+            alphabet.split('').forEach((char, i) => {
+                map[char] = alphabet[alphabet.length - 1 - i];
+            });
+            return map;
+        }
+
+        function createVowelSwapCipher() {
+            return {
+                'A': 'U', 'E': 'O', 'I': 'A', 'O': 'E', 'U': 'I',
+                'a': 'u', 'e': 'o', 'i': 'a', 'o': 'e', 'u': 'i',
+                ...createDefaultCipher()
+            };
+        }
+
+        function updateCryptography() {
+            const input = document.getElementById('plainText').value;
+            const encrypted = encodeText(input);
+            document.getElementById('encryptedText').value = encrypted;
+        }
+
+        function encodeText(text) {
+            return text.split('').map(char => cipherMap[char] || char).join('');
+        }
+
+        function startNewProject() {
+            document.getElementById('mainPage').style.display = 'none';
+            document.getElementById('projectPage').style.display = 'block';
+            document.getElementById('plainText').value = "";
+            document.getElementById('encryptedText').value = "";
+            cipherMap = createDefaultCipher(); // Reset cipher map
+        }
+
+        function showProjects() {
+            document.getElementById('mainPage').style.display = 'none';
+            const projectDiv = document.getElementById('projectPage');
+            projectDiv.innerHTML = '<h2>Saved Projects</h2>';
+            alert("No saved projects available.");
+        }
+
+        function showCipherLibrary() {
+            document.getElementById('projectPage').style.display = 'none';
+            document.getElementById('cipherLibrary').style.display = 'block';
+
+            const preCiphersDiv = document.getElementById('preInstalledCiphers');
+            preCiphersDiv.innerHTML = '';
+            for (let name in preInstalledCiphers) {
+                let item = document.createElement('div');
+                item.className = 'cipher-item';
+                item.textContent = name;
+                item.onclick = () => applyCipher(preInstalledCiphers[name]);
+                preCiphersDiv.appendChild(item);
+            }
+
+            const userCiphersDiv = document.getElementById('userCiphers');
+            userCiphersDiv.innerHTML = '';
+            userCiphers.forEach(cipher => {
+                let item = document.createElement('div');
+                item.className = 'cipher-item';
+                item.textContent = cipher.name;
+                item.onclick = () => applyCipher(cipher.pattern);
+                userCiphersDiv.appendChild(item);
+            });
+        }
+
+        function customCipherPattern() {
+            document.getElementById('projectPage').style.display = 'none';
+            document.getElementById('customCipherPage').style.display = 'block';
+
+            const container = document.getElementById('cipherInputs');
+            container.innerHTML = '';
+            const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'; // Including lowercase letters
+            alphabet.split('').forEach(letter => {
+                const inputRow = document.createElement('div');
+                inputRow.className = 'cipher-input';
+
+                const label = document.createElement('label');
+                label.textContent = `${letter}:`;
+
+                const input = document.createElement('input');
+                input.value = letter;
+
+                inputRow.appendChild(label);
+                inputRow.appendChild(input);
+                container.appendChild(inputRow);
+            });
+        }
+
+        function saveCustomCipher() {
+            const inputs = document.querySelectorAll('#cipherInputs input');
+            const newCipher = {};
+
+            inputs.forEach(input => {
+                const key = input.previousElementSibling.textContent.replace(':', '');
+                const value = input.value;
+                newCipher[key] = value;
+            });
+
+            const name = prompt('Enter a name for your custom cipher:');
+            if (name) {
+                const cipher = {
+                    name: name,
+                    pattern: newCipher
+                };
+                userCiphers.push(cipher);
+                alert('Custom cipher saved!');
+                goBackToProject();
+            }
+        }
+
+        function applyCipher(newCipher) {
+            cipherMap = newCipher;
+            updateCryptography();
+            goBackToProject();
+        }
+
+        function goBackToProject() {
+            document.getElementById('customCipherPage').style.display = 'none';
+            document.getElementById('cipherLibrary').style.display = 'none';
+            document.getElementById('projectPage').style.display = 'block';
+        }
+
+        function goBackHome() {
+            document.getElementById('projectPage').style.display = 'none';
+            document.getElementById('mainPage').style.display = 'block';
+        }
+    </script>
 </body>
 </html>
+
