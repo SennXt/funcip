@@ -89,6 +89,8 @@
         <button onclick="showCipherLibrary()">Select Cipher Pattern</button>
         <button onclick="customCipherPattern()">Create Custom Cipher</button>
         <button onclick="goBackHome()">Back to Home</button>
+        <button onclick="addRandomText()">Random Text</button> <!-- New button for random text -->
+        <button onclick="clearAllText()">Clear All</button> <!-- New Clear All button -->
     </div>
 
     <div id="cipherLibrary">
@@ -272,7 +274,19 @@
             document.getElementById('projectPage').style.display = 'none';
             document.getElementById('mainPage').style.display = 'block';
         }
+
+        // New function to add random text to the upper textfield
+        function addRandomText() {
+            const randomText = "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
+            document.getElementById('plainText').value = randomText;
+            updateCryptography(); // Update the encryption immediately after adding random text
+        }
+
+        // New function to clear all text in the upper textfield
+        function clearAllText() {
+            document.getElementById('plainText').value = "";
+            document.getElementById('encryptedText').value = "";
+        }
     </script>
 </body>
 </html>
-
