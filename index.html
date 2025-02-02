@@ -39,7 +39,7 @@
         }
 
         input {
-            width: 60px;
+            width: 200px; /* Increased width for multi-character input */
             padding: 5px;
             font-size: 14px;
             border: 2px solid blue;
@@ -92,7 +92,7 @@
         }
 
         .cipher-input input {
-            width: 60px;  /* Adjust width as needed */
+            width: 200px; /* Adjust width for multi-character inputs */
         }
 
         #cipherNameInput {
@@ -339,7 +339,6 @@
 
                 const input = document.createElement('input');
                 input.type = 'text';
-                input.maxLength = 1;
                 input.value = char;
                 input.id = `cipherInput_${char}`;
                 inputDiv.appendChild(input);
@@ -372,13 +371,13 @@
 
         function displayUserCiphers() {
             const userCiphersContainer = document.getElementById("userCiphers");
-            userCiphersContainer.innerHTML = '';
+            userCiphersContainer.innerHTML = ''; // Clear previous ciphers
 
-            userCiphers.forEach((userCipher, index) => {
+            userCiphers.forEach(({ name, cipher }) => {
                 const cipherDiv = document.createElement('div');
-                cipherDiv.textContent = userCipher.name;
+                cipherDiv.textContent = name;
                 cipherDiv.className = 'cipher-item';
-                cipherDiv.onclick = () => applyCipher(userCipher.cipher, userCipher.name);
+                cipherDiv.onclick = () => applyCipher(cipher, name);
                 userCiphersContainer.appendChild(cipherDiv);
             });
         }
@@ -389,8 +388,7 @@
         }
 
         function addRandomText() {
-            const randomText = "The quick brown fox jumps over the lazy dog.";
-            document.getElementById("plainText").value = randomText;
+            document.getElementById("plainText").value = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.';
             updateCryptography();
         }
 
